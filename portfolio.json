@@ -1,0 +1,20 @@
+[
+    {
+        "title": "sample",
+        "category": "design",
+        "file_path": "portfolio/design/sample.png",
+        "media_type": "image"
+    },
+    {
+        "title": "DAY 2",
+        "category": "illustration",
+        "file_path": "portfolio/illustration/DAY 2.jpg",
+        "media_type": "image"
+    },
+    {
+        "title": "sunset",
+        "category": "photography",
+        "file_path": "portfolio/photography/sunset.jpg",
+        "media_type": "image"
+    }
+]
