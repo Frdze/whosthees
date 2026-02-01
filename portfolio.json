@@ -1,1 +1,14 @@
-
+[
+  {
+    "title": "Sample Video",
+    "category": "design",
+    "embed_url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "media_type": "video"
+  },
+  {
+    "title": "Sample Image",
+    "category": "photography",
+    "embed_url": "https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&q=80",
+    "media_type": "image"
+  }
+]
