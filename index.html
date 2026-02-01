@@ -356,30 +356,16 @@
     }
 
     async function loadFromGitHub(owner, repo) {
-      const categories = ['design', 'development', 'illustration', 'photography', '3d'];
-      projects = [];
-      for (const category of categories) {
-        try {
-          const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/portfolio/${category}`);
-          const files = await response.json();
-          for (const file of files) {
-            if (file.type === 'file') {
-              const ext = file.name.split('.').pop().toLowerCase();
-              const media_type = ['mp4', 'webm', 'ogg'].includes(ext) ? 'video' : 'image';
-              const title = file.name.replace(/\.[^/.]+$/, "");
-              projects.push({
-                title: title,
-                category: category,
-                file_path: file.download_url,
-                media_type: media_type
-              });
-            }
-          }
-        } catch (error) {
-          console.error(`Error loading ${category}:`, error);
-        }
+      try {
+        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/portfolio.json`);
+        const file = await response.json();
+        const jsonResponse = await fetch(file.download_url);
+        const data = await jsonResponse.json();
+        projects = data;
+        renderProjects();
+      } catch (error) {
+        console.error('Error loading portfolio:', error);
       }
-      renderProjects();
     }
 
     loadPortfolio();
@@ -392,8 +378,8 @@
       grid.innerHTML = filteredProjects.map(project => `
         <div class="group relative overflow-hidden rounded-lg bg-card shadow-lg animate-scale-in">
           ${project.media_type === 'video' ?
-            `<video src="${project.file_path}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" muted></video>` :
-            `<img src="${project.file_path}" alt="${project.title}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">`
+            `<iframe src="${project.embed_url}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" frameborder="0" allowfullscreen></iframe>` :
+            `<img src="${project.embed_url}" alt="${project.title}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">`
           }
           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div class="text-center text-white">
