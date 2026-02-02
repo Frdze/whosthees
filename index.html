@@ -162,6 +162,9 @@
           Contact
           <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
         </a>
+        <button onclick="loadPortfolio(); renderProjects();" class="px-5 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80">
+          Reload
+        </button>
         <a href="#contact" class="px-5 py-2 rounded-full bg-primary text-primary-foreground text-sm font-medium">
           Let's Talk
         </a>
@@ -353,7 +356,7 @@
         loadFromGitHub(owner, repo);
       } else {
         // Local development, use JSON
-        fetch('portfolio.json')
+        fetch(`portfolio.json?t=${Date.now()}`)
           .then(response => response.json())
           .then(data => {
             projects = data;
@@ -365,9 +368,9 @@
 
     async function loadFromGitHub(owner, repo) {
       try {
-        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/portfolio.json`);
+        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/portfolio.json?t=${Date.now()}`);
         const file = await response.json();
-        const jsonResponse = await fetch(file.download_url);
+        const jsonResponse = await fetch(`${file.download_url}?t=${Date.now()}`);
         const data = await jsonResponse.json();
         projects = data;
         renderProjects();
@@ -379,10 +382,14 @@
     loadPortfolio();
 
     // Modal functions
-    function openModal(embedCode) {
+    function openModal(url, type) {
       const modal = document.getElementById('modal');
       const modalContent = document.getElementById('modal-content');
-      modalContent.innerHTML = embedCode;
+      if (type === 'video') {
+        modalContent.innerHTML = `<video src="${url}" controls autoplay class="max-w-full max-h-full"></video>`;
+      } else {
+        modalContent.innerHTML = `<img src="${url}" alt="Media" class="max-w-full max-h-full">`;
+      }
       modal.classList.remove('hidden');
       modal.classList.add('flex');
     }
@@ -399,10 +406,11 @@
       const filteredProjects = activeCategory === 'all' ? projects : projects.filter(p => p.category === activeCategory);
 
       grid.innerHTML = filteredProjects.map(project => `
-        <div class="group relative overflow-hidden rounded-lg bg-card shadow-lg animate-scale-in cursor-pointer" onclick="openModal('${project.embed_code.replace(/'/g, "\\'")}')">
-          <div class="w-full h-64 overflow-hidden">
-            ${project.embed_code}
-          </div>
+        <div class="group relative overflow-hidden rounded-lg bg-card shadow-lg animate-scale-in cursor-pointer" onclick="openModal('${project.url}', '${project.type}')">
+          ${project.type === 'video' ?
+            `<video src="${project.url}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" muted></video>` :
+            `<img src="${project.url}" alt="${project.title}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">`
+          }
           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div class="text-center text-white">
               <h3 class="text-xl font-bold">${project.title}</h3>
