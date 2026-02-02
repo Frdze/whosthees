@@ -329,6 +329,14 @@
     </div>
   </footer>
 
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50" onclick="closeModal()">
+    <div class="max-w-4xl w-full p-4" onclick="event.stopPropagation()">
+      <div id="modal-content"></div>
+      <button class="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
   <script>
     let projects = [];
     let activeCategory = 'all';
@@ -370,17 +378,31 @@
 
     loadPortfolio();
 
+    // Modal functions
+    function openModal(embedCode) {
+      const modal = document.getElementById('modal');
+      const modalContent = document.getElementById('modal-content');
+      modalContent.innerHTML = embedCode;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
     // Render projects
     function renderProjects() {
       const grid = document.getElementById('projects-grid');
       const filteredProjects = activeCategory === 'all' ? projects : projects.filter(p => p.category === activeCategory);
 
       grid.innerHTML = filteredProjects.map(project => `
-        <div class="group relative overflow-hidden rounded-lg bg-card shadow-lg animate-scale-in">
-          ${project.media_type === 'video' ?
-            `<iframe src="${project.embed_url}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105" frameborder="0" allowfullscreen></iframe>` :
-            `<img src="${project.embed_url}" alt="${project.title}" class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105">`
-          }
+        <div class="group relative overflow-hidden rounded-lg bg-card shadow-lg animate-scale-in cursor-pointer" onclick="openModal('${project.embed_code.replace(/'/g, "\\'")}')">
+          <div class="w-full h-64 overflow-hidden">
+            ${project.embed_code}
+          </div>
           <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div class="text-center text-white">
               <h3 class="text-xl font-bold">${project.title}</h3>
